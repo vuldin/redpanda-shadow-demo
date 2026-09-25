@@ -136,6 +136,8 @@ One sync interval later:
 
 This is because `start_at_earliest: {}` seeds a newly-discovered shadow topic from the source's earliest offset, not from "now." A topic that starts matching a prefix filter after the link is already running behaves identically to one that existed before the link was created - full history included, not just subsequent writes. Partition count and synced properties also carry over automatically.
 
+**Confirmed symmetric in the reverse direction too.** With both `demo-shadow-link` and `reverse-shadow-link` already `ACTIVE`, we created `back-newarrival` (2 partitions, 4 messages) directly on `redpanda-shadow` - `reverse-shadow-link`'s source - after the link was already running. Same result: not visible on `redpanda-source` immediately, then one sync interval later both partitions backfilled fully (lag 0) and all 4 messages round-tripped correctly. So this isn't a forward-link-only behavior - it holds for whichever cluster is acting as a link's source, in either direction of a bidirectional setup.
+
 ## Result 6: shadow topic creation does not depend on `auto_create_topics_enabled`
 
 Redpanda's Kafka-compatible `auto_create_topics_enabled` cluster property (note the trailing "d" - not Kafka's exact spelling) controls whether a *client* implicitly creates a topic by producing to / fetching metadata for a name that doesn't exist yet. This is a completely different mechanism from Shadow Link's own topic auto-creation.
