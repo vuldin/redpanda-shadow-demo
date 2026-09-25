@@ -1,0 +1,38 @@
+name: reverse-shadow-link
+
+# Points at the shadow cluster as the source for this link.
+# Created FROM redpanda-source, so redpanda-source is the destination here.
+client_options:
+  bootstrap_servers:
+  - redpanda-shadow:9092
+
+topic_metadata_sync_options:
+  interval: 10s
+  auto_create_shadow_topic_filters:
+  - pattern_type: PREFIX
+    filter_type: INCLUDE
+    name: back-
+  synced_shadow_topic_properties:
+  - retention.ms
+  - segment.ms
+  start_at_earliest: {}
+
+consumer_offset_sync_options:
+  interval: 10s
+  group_filters:
+  - pattern_type: LITERAL
+    filter_type: INCLUDE
+    name: '*'
+
+security_sync_options:
+  interval: 30s
+  acl_filters:
+  - resource_filter:
+      resource_type: TOPIC
+      pattern_type: PREFIXED
+      name: back-
+    access_filter:
+      principal: '*'
+      operation: ANY
+      permission_type: ALLOW
+      host: '*'

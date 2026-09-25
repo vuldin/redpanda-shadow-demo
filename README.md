@@ -43,6 +43,36 @@ make demo
 make check
 ```
 
+### Bidirectional shadow links
+
+Each cluster is the *destination* of exactly one shadow link (a hard
+Redpanda limit - a destination cluster can maintain only one shadow link).
+"Bidirectional" here means two independent links pointed at each other:
+
+```bash
+make start
+make setup           # demo-shadow-link: redpanda-source -> redpanda-shadow (demo-* topics)
+make setup-reverse    # reverse-shadow-link: redpanda-shadow -> redpanda-source (back-* topics)
+```
+
+Both links come up `STATE ACTIVE` at the same time and replicate real data
+in both directions, as long as the two directions shadow disjoint topic
+namespaces.
+
+To see what happens when the namespaces overlap (same topic name shadowed -
+or attempted to be shadowed - in both directions at once):
+
+```bash
+make test-overlap
+```
+
+See [`docs/findings.md`](docs/findings.md) for the full write-up: bidirectional
+links work fine with non-overlapping filters, but a naive "mirror everything
+both ways" (`'*'` filter on both links) silently shadows **nothing** for any
+topic name that already exists on both clusters - both links still report
+`STATE ACTIVE`, with no error or warning. `rpk shadow status <link> -t` (the
+per-topic `LAG`) is the only reliable signal, not link state alone.
+
 **Console URLs:**
 - Source: http://localhost:8080
 - Shadow: http://localhost:8081

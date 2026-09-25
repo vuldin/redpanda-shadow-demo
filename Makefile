@@ -1,4 +1,4 @@
-.PHONY: help start stop restart logs status setup demo check clean
+.PHONY: help start stop restart logs status setup setup-reverse demo check test-overlap clean
 
 help:
 	@echo "Redpanda Shadow Linking Demo - Available Commands"
@@ -8,16 +8,23 @@ help:
 	@echo "  make restart        - Restart all services"
 	@echo "  make logs           - View logs from all services"
 	@echo "  make status         - Check service status"
-	@echo "  make setup          - Initialize shadow link"
+	@echo "  make setup          - Initialize forward shadow link (source -> shadow)"
+	@echo "  make setup-reverse  - Initialize reverse shadow link (shadow -> source), for bidirectional"
 	@echo "  make demo           - Produce demo data"
 	@echo "  make check          - Check replication status"
+	@echo "  make test-overlap   - Run the overlapping-topic experiment (see docs/findings.md)"
 	@echo "  make clean          - Stop and remove all containers and volumes"
 	@echo ""
-	@echo "Quick Start:"
+	@echo "Quick Start (one-directional):"
 	@echo "  1. make start"
 	@echo "  2. make setup"
 	@echo "  3. make demo"
 	@echo "  4. make check"
+	@echo ""
+	@echo "Bidirectional:"
+	@echo "  1. make start"
+	@echo "  2. make setup && make setup-reverse"
+	@echo "  3. make test-overlap   (to see what happens with overlapping topics)"
 
 start:
 	@echo "Starting Redpanda shadow demo environment..."
@@ -48,6 +55,14 @@ status:
 setup:
 	@echo "Initializing shadow link..."
 	docker exec rpk-client /scripts/setup-shadow-link.sh
+
+setup-reverse:
+	@echo "Initializing reverse shadow link for bidirectional replication..."
+	docker exec rpk-client /scripts/setup-reverse-shadow-link.sh
+
+test-overlap:
+	@echo "Running overlapping-topic experiment..."
+	docker exec rpk-client /scripts/test-overlap.sh
 
 demo:
 	@echo "Producing demo data..."

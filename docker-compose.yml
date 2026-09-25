@@ -1,7 +1,7 @@
 services:
   # Source Cluster
   redpanda-source:
-    image: docker.redpanda.com/redpandadata/redpanda:v25.3.1
+    image: docker.redpanda.com/redpandadata/redpanda:v26.2.2
     container_name: redpanda-source
     hostname: redpanda-source
     command:
@@ -35,7 +35,7 @@ services:
       start_period: 30s
 
   console-source:
-    image: docker.redpanda.com/redpandadata/console:v3.3.2
+    image: docker.redpanda.com/redpandadata/console:v3.11.0
     container_name: console-source
     depends_on:
       - redpanda-source
@@ -55,7 +55,7 @@ services:
 
   # Shadow Cluster
   redpanda-shadow:
-    image: docker.redpanda.com/redpandadata/redpanda:v25.3.1
+    image: docker.redpanda.com/redpandadata/redpanda:v26.2.2
     container_name: redpanda-shadow
     hostname: redpanda-shadow
     command:
@@ -89,7 +89,7 @@ services:
       start_period: 30s
 
   console-shadow:
-    image: docker.redpanda.com/redpandadata/console:v3.3.2
+    image: docker.redpanda.com/redpandadata/console:v3.11.0
     container_name: console-shadow
     depends_on:
       - redpanda-shadow
@@ -109,7 +109,7 @@ services:
 
   # Client container for testing and setup
   rpk-client:
-    image: docker.redpanda.com/redpandadata/redpanda:v25.3.1
+    image: docker.redpanda.com/redpandadata/redpanda:v26.2.2
     container_name: rpk-client
     depends_on:
       - redpanda-source

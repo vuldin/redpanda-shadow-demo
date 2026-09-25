@@ -1,0 +1,23 @@
+name: demo-shadow-link
+
+client_options:
+  bootstrap_servers:
+  - redpanda-source:9092
+
+topic_metadata_sync_options:
+  interval: 10s
+  auto_create_shadow_topic_filters:
+  - pattern_type: LITERAL
+    filter_type: INCLUDE
+    name: '*'
+  synced_shadow_topic_properties:
+  - retention.ms
+  - segment.ms
+  start_at_earliest: {}
+
+consumer_offset_sync_options:
+  interval: 10s
+  group_filters:
+  - pattern_type: LITERAL
+    filter_type: INCLUDE
+    name: '*'

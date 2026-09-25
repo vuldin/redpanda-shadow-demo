@@ -25,7 +25,16 @@ consumer_offset_sync_options:
     filter_type: INCLUDE
     name: '*'
 
-# ACL replication (optional)
+# ACL replication (optional).
+# access_filter.principal has NO wildcard/match-any support - it's a literal
+# PrincipalType:name string. A bare '*' is rejected outright at the broker
+# ("Invalid principal name") and silently kills this task every interval
+# (visible only in broker logs, not in `rpk shadow status`). And
+# resource_filter.pattern_type must match the ACL's OWN pattern type exactly -
+# a PREFIXED filter will not pick up a LITERAL-pattern ACL just because its
+# name happens to start with the prefix. See docs/findings.md Result 7.
+# One acl_filters entry only ever matches ONE literal principal - add more
+# entries for more principals.
 security_sync_options:
   interval: 30s
   acl_filters:
@@ -34,7 +43,7 @@ security_sync_options:
       pattern_type: PREFIXED
       name: demo-
     access_filter:
-      principal: '*'
+      principal: 'User:demo-service-account'
       operation: ANY
       permission_type: ALLOW
       host: '*'
